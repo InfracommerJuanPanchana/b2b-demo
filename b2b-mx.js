@@ -1,22 +1,21 @@
 const fields = [
   { label: 'RFC', name: 'RFC', isRequired: true, type: 'text' },
-  { label: 'business-name', name: 'business-name', isRequired: true, type: 'text' },
-  { label: 'business-line', name: 'business-line', isRequired: false, type: 'text' },
-  { label: 'address', name: 'address', isRequired: false, type: 'text' },
-  { label: 'number', name: 'number', isRequired: false, type: 'text' },
-  { label: 'number-dep', name: 'number-dep', isRequired: false, type: 'text' },
-  { label: 'state', name: 'state', isRequired: false, type: 'text' },
-  { label: 'neighborhood', name: 'neighborhood', isRequired: false, type: 'text' },
-  { label: 'city', name: 'city', isRequired: false, type: 'text' },
-  { label: 'zipcode', name: 'zipcode', isRequired: true, type: 'text' },
-  { label: 'payment-code', name: 'payment-code', isRequired: true, type: 'text' },
-  { label: 'cfdi-code', name: 'cfdi-code', isRequired: true, type: 'text' },
-  { label: 'tax-regime', name: 'tax-regime', isRequired: true, type: 'text' },
-  { label: 'anexo', name: 'anexo', isRequired: false, type: 'text' },
-  { label: 'pedidos', name: 'pedidos', isRequired: false, type: 'text' },
-  /*   { label: 'isCorporateOms', name: 'isCorporateOms', isRequired: true }, */
-  { label: 'Country-Code', name: 'Country-Code', isRequired: true, type: 'text' },
-  { label: 'CFDI-required', name: 'CFDI-required', isRequired: false, type: 'checkbox', options: ['1', '2', '3'] },
+  { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text' },
+  { label: 'Línea de negocio o giro', name: 'business-line', isRequired: false, type: 'text' },
+  { label: 'Dirección', name: 'address', isRequired: false, type: 'text' },
+  { label: 'Numero', name: 'number', isRequired: false, type: 'text' },
+  { label: 'Número de departamento', name: 'number-dep', isRequired: false, type: 'text' },
+  { label: 'País', name: 'state', isRequired: false, type: 'text' },
+  { label: 'Complemento', name: 'neighborhood', isRequired: false, type: 'text' },
+  { label: 'Ciudad', name: 'city', isRequired: false, type: 'text' },
+  { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text' },
+  { label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'text' },
+  { label: 'Código CFDI', name: 'cfdi-code', isRequired: true, type: 'text' },
+  { label: 'Régimen Fiscal', name: 'tax-regime', isRequired: true, type: 'text' },
+  { label: 'Anexo', name: 'anexo', isRequired: false, type: 'text' },
+  { label: 'Pedidos', name: 'pedidos', isRequired: false, type: 'text' },
+  { label: 'Código del país', name: 'Country-Code', isRequired: true, type: 'text' },
+  { label: 'Requiere CFDI', name: 'CFDI-required', isRequired: false, type: 'checkbox', options: ['1', '2', '3'] },
 ]
 
 window.onload = function () {
@@ -56,22 +55,6 @@ const setFormCustom = () => {
 
         if (corporateInfoBox.length && !formCustom.length) {
           const fieldsToMap = fields.map((item) => {
-            /* const type = item?.type
-            const options = item?.options
-
-            const optionsToMap = options.map((item) => {
-              return `<option value="${item}">${item}</option>`
-            })
-
-            if (type === 'select') {
-              return `<p class="${item.name} input text containerInputCustom">
-              <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
-              <select id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlur('${item.name}')">
-              <option value="">Selecciona una opción</option>
-              ${optionsToMap.toString().replace(/,/g, '')}
-              </select>
-            </p>`
-            } */
             return `<p class="${item.name} input text containerInputCustom">
             <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
             <input type="${item.type}" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlur('${item.name}')"/>
