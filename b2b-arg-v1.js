@@ -1,16 +1,8 @@
 const appName = "billing";
 
 const fields = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text' },
-    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text' },
-    { label: 'Línea de negocio o giro', name: 'business-line', isRequired: false, type: 'text' },
-    { label: 'Número teléfono', name: 'phone-new"', isRequired: false, type: 'text' },
-    { label: 'Dirección', name: 'address', isRequired: false, type: 'text' },
-    { label: 'Número', name: 'number"', isRequired: false, type: 'text' },
-    { label: 'Número de departamento', name: 'number-dep', isRequired: false, type: 'text' },
-    { label: 'Complemento', name: 'neighborhood', isRequired: false, type: 'text' },
-    { label: 'Ciudad', name: 'city', isRequired: false, type: 'text' },
-    { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text' },
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave,consta de 13 dígitos." },
+    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, siguiendo la estructura NOMBRE(S) APELLIDO PATERNO APELLIDO MATERNO" },
     {
         label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'select', options: [
             "01-Efectivo",
@@ -36,13 +28,22 @@ const fields = [
             "31-Intermediario pagos",
             "99-Por definir"
         ]
-    }
+    },
+    { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos." },
+    { label: 'Datos complementarios', type: 'label' },
+    { label: 'Línea de negocio o giro', name: 'business-line', isRequired: false, type: 'text' },
+    { label: 'Número teléfono', name: 'phone-new"', isRequired: false, type: 'text' },
+    { label: 'Dirección', name: 'address', isRequired: false, type: 'text' },
+    { label: 'Número', name: 'number"', isRequired: false, type: 'text' },
+    { label: 'Número de departamento', name: 'number-dep', isRequired: false, type: 'text' },
+    { label: 'Colonia', name: 'neighborhood', isRequired: false, type: 'text' },
+    { label: 'Ciudad', name: 'city', isRequired: false, type: 'text' }
 ]
 
 const fieldsNormal = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text' },
-    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text' },
-    { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text' },
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 12 dígitos" },
+    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación." },
+    { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos." },
     {
         label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'select', options: [
             "01-Efectivo",
@@ -449,7 +450,7 @@ const onAttachmentB2BButton = () => {
         $(".form-step.box-edit > .box-client-info > .row-fluid").append(`
             <div id="b2b-form-container">
                 <div>
-                    <span>¿Requieres CFDI?</span>
+                    <span>¿Requieres Factura?</span>
                     <div style="display:flex;margin-top:10px">
                         <p style="display:flex;align-items: center;">
                             <input type="radio" id="CFDI-si" value="true" name="cfdi" style="margin-top: 0"/>
@@ -496,57 +497,58 @@ const onAttachmentB2BButton = () => {
                         </div>`)
                     }, 100);
 
-                } else {
-                    $(".container-custom-data-form").remove();
-                }
-
-                if (buttonb2bform && buttonb2bform.length) {
-                    $("#button-b2b-form").html(`
-                        <div>
-                            <span>¿Sumar datos de facturación?</span>
-                            <div style="display:flex;margin-top:10px">
-                                <p style="display:flex;align-items: center;">
-                                    <input type="radio" id="corporative-si" value="true" name="corporative" style="margin-top: 0"/>
-                                    <label for="corporative-si" style="line-height: 3px;margin-left: 5px;">Si</label>
-                                </p>
-                                <p style="display:flex;align-items: center;margin-left: 15px;">
-                                    <input type="radio" id="corporative-no" value="false" name="corporative" style="margin-top: 0"/>
-                                    <label for="corporative-no" style="line-height: 3px;margin-left: 5px;">No</label>
-                                </p>
-                            </div>
-                        </div>
-                    `)
-                } else {
-                    $("#b2b-form-container").after(`
-                        <div id="button-b2b-form" style="margin-top:10px;cursor:pointer">
-                            <div>
-                                <span>¿Sumar datos de facturación?</span>
+                    if (buttonb2bform && buttonb2bform.length) {
+                        $("#button-b2b-form").html(`
+                            <div class="container-custom-data-form-facturacion">
+                                <span>¿Tipo de persona?</span>
                                 <div style="display:flex;margin-top:10px">
                                     <p style="display:flex;align-items: center;">
                                         <input type="radio" id="corporative-si" value="true" name="corporative" style="margin-top: 0"/>
-                                        <label for="corporative-si" style="line-height: 3px;margin-left: 5px;">Si</label>
+                                        <label for="corporative-si" style="line-height: 3px;margin-left: 5px;">Moral</label>
                                     </p>
                                     <p style="display:flex;align-items: center;margin-left: 15px;">
                                         <input type="radio" id="corporative-no" value="false" name="corporative" style="margin-top: 0"/>
-                                        <label for="corporative-no" style="line-height: 3px;margin-left: 5px;">No</label>
+                                        <label for="corporative-no" style="line-height: 3px;margin-left: 5px;">Física</label>
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    `)
-                }
-
-                $('input[name="corporative"]').change(function () {
-                    if ($(this).is(":checked")) {
-                        var val = eval($(this).val());
-                        vtexjs.checkout.setCustomData({ field: "isCorporateOms", app: appName, value: val })
-                        if (val) {
-                            setFormCustom();
-                        } else {
-                            setFormCustomDefault();
-                        }
+                        `)
+                    } else {
+                        $("#b2b-form-container").after(`
+                            <div id="button-b2b-form" style="margin-top:10px;cursor:pointer">
+                                <div>
+                                    <span>¿Tipo de persona?</span>
+                                    <div style="display:flex;margin-top:10px">
+                                        <p style="display:flex;align-items: center;">
+                                            <input type="radio" id="corporative-si" value="true" name="corporative" style="margin-top: 0"/>
+                                            <label for="corporative-si" style="line-height: 3px;margin-left: 5px;">Moral</label>
+                                        </p>
+                                        <p style="display:flex;align-items: center;margin-left: 15px;">
+                                            <input type="radio" id="corporative-no" value="false" name="corporative" style="margin-top: 0"/>
+                                            <label for="corporative-no" style="line-height: 3px;margin-left: 5px;">Física</label>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        `)
                     }
-                })
+    
+                    $('input[name="corporative"]').change(function () {
+                        if ($(this).is(":checked")) {
+                            var val = eval($(this).val());
+                            vtexjs.checkout.setCustomData({ field: "isCorporateOms", app: appName, value: val })
+                            if (val) {
+                                setFormCustom();
+                            } else {
+                                setFormCustomDefault();
+                            }
+                        }
+                    })
+
+                } else {
+                    $("#button-b2b-form").length && $("#button-b2b-form").remove();
+                    $(".container-custom-data-form").remove();
+                }
             }
         })
 
@@ -576,6 +578,7 @@ const setFormCustomDefault = () => {
                     return `<p class="${item.name} input text containerInputCustom">
               <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
               <input type="${item.type}" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
+              ${item?.message ? `<span>${item?.message}</span>` : ""}
             </p>`
                 })
                 
@@ -615,9 +618,18 @@ const setFormCustom = () => {
               </p>`
                     }
 
+                    if (item.type === "label") {
+                        return `
+                            <p class="${item.label} input text containerInputCustom">
+                                <label>${item.label}</label>
+                            </p>
+                        `
+                    }
+
                     return `<p class="${item.name} input text containerInputCustom">
               <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
               <input type="${item.type}" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
+              ${item?.message ? `<span>${item?.message}</span>` : ""}
             </p>`
                 })
                 
