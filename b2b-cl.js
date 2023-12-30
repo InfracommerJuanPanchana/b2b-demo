@@ -1,8 +1,29 @@
 const appName = "billing";
+let typeInput = null;
+let validFields= {
+    RFC: false,
+    'business-name': false,
+    'payment-code': false,
+    zipcode: false,
+    'business-line':false,
+    'phone-new': false,
+    address: false,
+    number: false,
+    'number-dep':false,
+    neighborhood: false,
+    city: false
+}
+
+let validFieldsNormal = {
+    RFC: false,
+    'business-name': false,
+    'payment-code': false,
+    zipcode: false
+}
 
 const fields = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave,consta de 13 dígitos." },
-    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, siguiendo la estructura NOMBRE(S) APELLIDO PATERNO APELLIDO MATERNO" },
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text'},
+    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text'},
     {
         label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'select', options: [
             "01-Efectivo",
@@ -31,13 +52,13 @@ const fields = [
     },
     { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos." },
     { label: 'Datos complementarios', type: 'label' },
-    { label: 'Línea de negocio o giro', name: 'business-line', isRequired: false, type: 'text' },
-    { label: 'Número teléfono', name: 'phone-new"', isRequired: false, type: 'text' },
-    { label: 'Dirección', name: 'address', isRequired: false, type: 'text' },
-    { label: 'Número', name: 'number"', isRequired: false, type: 'text' },
-    { label: 'Número de departamento', name: 'number-dep', isRequired: false, type: 'text' },
-    { label: 'Colonia', name: 'neighborhood', isRequired: false, type: 'text' },
-    { label: 'Ciudad', name: 'city', isRequired: false, type: 'text' }
+    { label: 'Línea de negocio o giro', name: 'business-line', isRequired: true, type: 'text' },
+    { label: 'Número teléfono', name: 'phone-new', isRequired: true, type: 'text' },
+    { label: 'Dirección', name: 'address', isRequired: true, type: 'text' },
+    { label: 'Número', name: 'number', isRequired: true, type: 'text' },
+    { label: 'Número de departamento', name: 'number-dep', isRequired: true, type: 'text' },
+    { label: 'Colonia', name: 'neighborhood', isRequired: true, type: 'text' },
+    { label: 'Ciudad', name: 'city', isRequired: true, type: 'text' }
 ]
 
 const fieldsNormal = [
@@ -45,7 +66,7 @@ const fieldsNormal = [
     { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación." },
     { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos." },
     {
-        label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'select', options: [
+        label: 'Método de pago', name: 'payment-code', isRequired: false, type: 'select', options: [
             "01-Efectivo",
             "02-Cheque nominativo",
             "03-Transferencia eléctronica de fondos",
@@ -447,6 +468,7 @@ const onAttachmentB2BButton = () => {
     const b2bButton = $("#b2b-form-container");
 
     if (profileContainer && profileContainer.length && !b2bButton.length) {
+        $(".corporate-hide-link").css("display", "none")
         $(".form-step.box-edit > .box-client-info > .row-fluid").append(`
             <div id="b2b-form-container">
                 <div>
@@ -466,13 +488,15 @@ const onAttachmentB2BButton = () => {
  
         `);
 
+        $("#CFDI-no").click()
+
         $('input[name="cfdi"]').change(function () {
             if ($(this).is(":checked")) {
                 var val = eval($(this).val());
                 const buttonb2bform = $("#button-b2b-form");
                 vtexjs.checkout.setCustomData({ field: "CFDI-required", app: appName, value: val })
                 if (val) {
-
+                    $('#go-to-shipping, #go-to-payment').prop('disabled', true)
                     const fieldsToMap = FIELD_CFDI.map((item) => {
                         return `<p class="${item.name} input text containerInputCustom">
                         <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
@@ -537,6 +561,7 @@ const onAttachmentB2BButton = () => {
                         if ($(this).is(":checked")) {
                             var val = eval($(this).val());
                             vtexjs.checkout.setCustomData({ field: "isCorporateOms", app: appName, value: val })
+                            typeInput = val ? "Moral" : "Fisica";
                             if (val) {
                                 setFormCustom();
                             } else {
@@ -546,6 +571,7 @@ const onAttachmentB2BButton = () => {
                     })
 
                 } else {
+                    $('#go-to-shipping, #go-to-payment').prop('disabled', false)
                     $("#button-b2b-form").length && $("#button-b2b-form").remove();
                     $(".container-custom-data-form").remove();
                 }
@@ -682,6 +708,14 @@ const onChangeB2b = (id) => {
     }
 }
 
+const onValidateButton = () => {
+    if (type === "Moral") {
+        console.log("validFields",validFields)
+    } else {
+        console.log("validFieldsNormal",validFieldsNormal)
+    }
+}
+
 const onBlurB2bForm = (name) => {
     const buttonContinue = $('#go-to-shipping')
     const element = $(`#${name}`)
@@ -710,6 +744,33 @@ const onBlurB2bForm = (name) => {
             if (errorCustom.length) {
                 errorCustom.hide()
             }
+
+            console.log("Moral, ", typeInput)
+
+            if (typeInput === "Moral") {
+               const isError = fields.some(f => {
+                    if (!f.isRequired) return false;
+                    return !$(`#${f.name}`).val()
+                })
+
+                if (!isError) {
+                    $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                } else {
+                    $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                }
+            } else {
+                const isError = fieldsNormal.some(f => {
+                    if (!f.isRequired) return false;
+                    return !$(`#${f.name}`).val()
+                })
+
+                if (!isError) {
+                    $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                } else {
+                    $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                }
+            }
+
             vtexjs.checkout.setCustomData({ field: name, app: appName, value })
         } else {
             if (element.length && !$(`.${name} .errorCustom`).length && isRequired) {
