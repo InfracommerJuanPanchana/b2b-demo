@@ -23,7 +23,7 @@ let validFieldsNormal = {
 
 const fields = [
     { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{13}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 13 dígitos"},
-    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', regex: '^[A-ZÑ]+$', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación."},
+    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', regex: '^[A-ZÑ ]+$', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación."},
     {
         label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'select', options: [
             "01-Efectivo",
@@ -62,8 +62,8 @@ const fields = [
 ]
 
 const fieldsNormal = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{13}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 13 dígitos" },
-    { label: 'Razón social', name: 'business-name', isRequired: true, regex: '^[A-ZÑ]+$' ,type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación." },
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{12}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 12 dígitos" },
+    { label: 'Razón social', name: 'business-name', isRequired: true, regex: '^[A-ZÑ ]+$' ,type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación." },
     { label: 'Código Postal', name: 'zipcode', isRequired: true, regex:'^.{5}$',type: 'text', message: "consta de un número de 5 dígitos." },
     {
         label: 'Método de pago', name: 'payment-code', isRequired: false, type: 'select', options: [
@@ -587,6 +587,7 @@ const onAttachmentB2BButton = () => {
                     removeCustomData("business-name");
                     removeCustomData("business-line");
                     removeCustomData("address");
+                    removeCustomData("RFC");
                     vtexjs.checkout.setCustomData({ field: "CFDI-required", app: appName, value: "false" })
                     
                 }
