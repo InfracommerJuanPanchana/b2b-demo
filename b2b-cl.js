@@ -22,8 +22,8 @@ let validFieldsNormal = {
 }
 
 const fields = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text'},
-    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text'},
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{13}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 13 dígitos"},
+    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', regex: '^[A-ZÑ]+$', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación."},
     {
         label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'select', options: [
             "01-Efectivo",
@@ -50,7 +50,7 @@ const fields = [
             "99-Por definir"
         ]
     },
-    { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos." },
+    { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos.", regex:'^.{5}$' },
     { label: 'Datos complementarios', type: 'label' },
     { label: 'Línea de negocio o giro', name: 'business-line', isRequired: true, type: 'text' },
     { label: 'Número teléfono', name: 'phone-new', isRequired: true, type: 'text' },
@@ -62,9 +62,9 @@ const fields = [
 ]
 
 const fieldsNormal = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 12 dígitos" },
-    { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación." },
-    { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos." },
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{13}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 13 dígitos" },
+    { label: 'Razón social', name: 'business-name', isRequired: true, regex: '^[A-ZÑ]+$' ,type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación." },
+    { label: 'Código Postal', name: 'zipcode', isRequired: true, regex:'^.{5}$',type: 'text', message: "consta de un número de 5 dígitos." },
     {
         label: 'Método de pago', name: 'payment-code', isRequired: false, type: 'select', options: [
             "01-Efectivo",
@@ -574,6 +574,21 @@ const onAttachmentB2BButton = () => {
                     $('#go-to-shipping, #go-to-payment').prop('disabled', false)
                     $("#button-b2b-form").length && $("#button-b2b-form").remove();
                     $(".container-custom-data-form").remove();
+                    removeCustomData("zipcode");
+                    removeCustomData("tax-regime");
+                    removeCustomData("phone-new");
+                    removeCustomData("payment-code");
+                    removeCustomData("number-dep");
+                    removeCustomData("number");
+                    removeCustomData("neighborhood");
+                    removeCustomData("isCorporateOms");
+                    removeCustomData("city");
+                    removeCustomData("cfdi-code");
+                    removeCustomData("business-name");
+                    removeCustomData("business-line");
+                    removeCustomData("address");
+                    vtexjs.checkout.setCustomData({ field: "CFDI-required", app: appName, value: "false" })
+                    
                 }
             }
         })
@@ -604,6 +619,7 @@ const setFormCustomDefault = () => {
                     return `<p class="${item.name} input text containerInputCustom">
               <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
               <input type="${item.type}" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
+              <span class="input-b2b-error"></span>
               ${item?.message ? `<span>${item?.message}</span>` : ""}
             </p>`
                 })
@@ -655,6 +671,7 @@ const setFormCustom = () => {
                     return `<p class="${item.name} input text containerInputCustom">
               <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
               <input type="${item.type}" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
+              <span class="input-b2b-error"></span>
               ${item?.message ? `<span>${item?.message}</span>` : ""}
             </p>`
                 })
@@ -708,6 +725,11 @@ const onChangeB2b = (id) => {
     }
 }
 
+const onValidateInput = (id) => {
+    // const value = $(`#${id}`).val();
+    console.log("value",id)
+}
+
 const onValidateButton = () => {
     if (type === "Moral") {
         console.log("validFields",validFields)
@@ -720,7 +742,7 @@ const onBlurB2bForm = (name) => {
     const buttonContinue = $('#go-to-shipping')
     const element = $(`#${name}`)
     const type = fields.find((e) => e.name === name)?.type
-    const isRequired = fields.find((e) => e.name === name)?.isRequired
+    const isRequired = fields.find((e) => e.name === name)?.isRequired    
 
     if (type === 'checkbox') {
         const isChecked = $('#CFDI-required').is(':checked')
@@ -745,37 +767,44 @@ const onBlurB2bForm = (name) => {
                 errorCustom.hide()
             }
 
-            console.log("Moral, ", typeInput)
-
             if (typeInput === "Moral") {
-               const isError = fields.some(f => {
-                    if (!f.isRequired) return false;
-                    return !$(`#${f.name}`).val()
-                })
+                const isError = fieldsNormal.some(f => {
+                    const regexTest = new RegExp(f.regex);
+                    if (f.name === name && !!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+                    if (f.name === name && !f.isRequired) return false;
+                    return f.name === name && !$(`#${f.name}`).val()
+                })      
 
                 if (!isError) {
                     $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                    $(`#${name} + .input-b2b-error`).html('')
                 } else {
+                    $(`#${name} + .input-b2b-error`).html('<span style="color: red">Campo incompleto</span><br/>')
                     $('#go-to-shipping, #go-to-payment').prop('disabled', true)
                 }
             } else {
                 const isError = fieldsNormal.some(f => {
-                    if (!f.isRequired) return false;
-                    return !$(`#${f.name}`).val()
-                })
+                    const regexTest = new RegExp(f.regex);
+                    if (f.name === name && !!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+                    if (f.name === name && !f.isRequired) return false;
+                    return f.name === name && !$(`#${f.name}`).val()
+                })                
 
                 if (!isError) {
                     $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                    $(`#${name} + .input-b2b-error`).html('')
                 } else {
                     $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                    $(`#${name} + .input-b2b-error`).html('<span style="color: red">Campo incompleto</span><br/>')
                 }
             }
-
             vtexjs.checkout.setCustomData({ field: name, app: appName, value })
         } else {
             if (element.length && !$(`.${name} .errorCustom`).length && isRequired) {
                 $(`.${name}`).append(`<div class="help error errorCustom">Este campo es obligatorio</div>`)
             }
+
+            removeCustomData(name)
         }
     }
 
@@ -801,4 +830,11 @@ const validateErrors = () => {
     })
 
     return existError
+}
+
+const removeCustomData = (name) => {
+    const orderFormId = vtexjs?.checkout?.orderFormId
+    fetch(`/api/checkout/pub/orderForm/${orderFormId}/customData/${appName}/${name}`, {
+        method: 'DELETE'
+    })
 }
