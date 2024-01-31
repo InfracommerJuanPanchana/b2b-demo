@@ -22,7 +22,7 @@ let validFieldsNormal = {
 }
 
 const fields = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{13}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 13 dígitos"},
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{12}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 12 dígitos", uppercase: true},
     { label: 'Razón social', name: 'business-name', isRequired: true, type: 'text', regex: '^[A-ZÑ ]+$', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación."},
     {
         label: 'Método de pago', name: 'payment-code', isRequired: true, type: 'select', options: [
@@ -52,17 +52,17 @@ const fields = [
     },
     { label: 'Código Postal', name: 'zipcode', isRequired: true, type: 'text', message: "consta de un número de 5 dígitos.", regex:'^.{5}$' },
     { label: 'Datos complementarios', type: 'label' },
-    { label: 'Línea de negocio o giro', name: 'business-line', isRequired: true, type: 'text' },
-    { label: 'Número teléfono', name: 'phone-new', isRequired: true, type: 'text' },
-    { label: 'Dirección', name: 'address', isRequired: true, type: 'text' },
-    { label: 'Número', name: 'number', isRequired: true, type: 'text' },
-    { label: 'Número de departamento', name: 'number-dep', isRequired: true, type: 'text' },
-    { label: 'Colonia', name: 'neighborhood', isRequired: true, type: 'text' },
-    { label: 'Ciudad', name: 'city', isRequired: true, type: 'text' }
+    { label: 'Línea de negocio o giro', name: 'business-line', isRequired: false, type: 'text' },
+    { label: 'Número teléfono', name: 'phone-new', isRequired: false, type: 'text' },
+    { label: 'Dirección', name: 'address', isRequired: false, type: 'text' },
+    { label: 'Número', name: 'number', isRequired: false, type: 'text' },
+    { label: 'Número de departamento', name: 'number-dep', isRequired: false, type: 'text' },
+    { label: 'Colonia', name: 'neighborhood', isRequired: false, type: 'text' },
+    { label: 'Ciudad', name: 'city', isRequired: false, type: 'text' }
 ]
 
 const fieldsNormal = [
-    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{12}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 12 dígitos" },
+    { label: 'RFC', name: 'RFC', isRequired: true, type: 'text',regex:'^[A-Z0-9]{13}$', message: "Se debe escribir en mayúsculas y sin espacios ni guiones, Debe incluir homoclave, consta de 13 dígitos" },
     { label: 'Razón social', name: 'business-name', isRequired: true, regex: '^[A-ZÑ ]+$' ,type: 'text', message: "Se debe escribir en mayúsculas y sin acentos, sin incluir régimen societario o de capital, respetando puntuación." },
     { label: 'Código Postal', name: 'zipcode', isRequired: true, regex:'^.{5}$',type: 'text', message: "consta de un número de 5 dígitos." },
     {
@@ -463,11 +463,82 @@ const onMutation = () => {
     })
 }
 
+$(document).ready(function(){
+    setTimeout(() => {
+        const b2bComplete = sessionStorage.getItem("b2b-form-complete");
+        if (!b2bComplete) {
+            removeCustomData("zipcode");
+            removeCustomData("tax-regime");
+            removeCustomData("phone-new");
+            removeCustomData("payment-code");
+            removeCustomData("number-dep");
+            removeCustomData("number");
+            removeCustomData("neighborhood");
+            removeCustomData("isCorporateOms");
+            removeCustomData("city");
+            removeCustomData("cfdi-code");
+            removeCustomData("business-name");
+            removeCustomData("business-line");
+            removeCustomData("address");
+            removeCustomData("RFC");
+            vtexjs.checkout.setCustomData({ field: "CFDI-required", app: appName, value: "false" })
+        }
+
+    }, 1000);
+});
+
+$(window).on('hashchange', function(e){
+    
+    setTimeout(() => {
+        if (window?.location?.hash === '#/profile' && $("#b2b-form-container").length) {
+            console.log("remove function")
+            $("#b2b-form-container").remove();
+            $(".container-custom-data-form").remove();
+            $("#button-b2b-form").remove();
+            $("#b2b-form-container").remove();
+        }
+        if (window?.location?.hash === '#/profile') {
+            removeCustomData("zipcode");
+            removeCustomData("tax-regime");
+            removeCustomData("phone-new");
+            removeCustomData("payment-code");
+            removeCustomData("number-dep");
+            removeCustomData("number");
+            removeCustomData("neighborhood");
+            removeCustomData("isCorporateOms");
+            removeCustomData("city");
+            removeCustomData("cfdi-code");
+            removeCustomData("business-name");
+            removeCustomData("business-line");
+            removeCustomData("address");
+            removeCustomData("RFC");
+            vtexjs.checkout.setCustomData({ field: "CFDI-required", app: appName, value: "false" })
+        }
+    }, 1000);
+});
+
 const onAttachmentB2BButton = () => {
     const profileContainer = $(".form-step.box-edit > .box-client-info > .row-fluid");
     const b2bButton = $("#b2b-form-container");
 
-    if (profileContainer && profileContainer.length && !b2bButton.length) {
+    if (profileContainer && profileContainer.length && !b2bButton.length && window?.location?.hash === '#/profile') {
+        if (window?.location?.hash === '#/profile') {
+            removeCustomData("zipcode");
+            removeCustomData("tax-regime");
+            removeCustomData("phone-new");
+            removeCustomData("payment-code");
+            removeCustomData("number-dep");
+            removeCustomData("number");
+            removeCustomData("neighborhood");
+            removeCustomData("isCorporateOms");
+            removeCustomData("city");
+            removeCustomData("cfdi-code");
+            removeCustomData("business-name");
+            removeCustomData("business-line");
+            removeCustomData("address");
+            removeCustomData("RFC");
+            vtexjs.checkout.setCustomData({ field: "CFDI-required", app: appName, value: "false" })
+        }
         $(".corporate-hide-link").css("display", "none")
         $(".form-step.box-edit > .box-client-info > .row-fluid").append(`
             <div id="b2b-form-container">
@@ -562,9 +633,16 @@ const onAttachmentB2BButton = () => {
                             var val = eval($(this).val());
                             vtexjs.checkout.setCustomData({ field: "isCorporateOms", app: appName, value: val })
                             typeInput = val ? "Moral" : "Fisica";
+                            $(".container-custom-data-form-element").remove();
                             if (val) {
+                                $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                                resetInformation();
+                                 vtexjs.checkout.setCustomData({ field: "isCorporateOms", app: appName, value: "true" })
                                 setFormCustom();
                             } else {
+                                $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                                resetInformation();
+                                 vtexjs.checkout.setCustomData({ field: "isCorporateOms", app: appName, value: "false" })
                                 setFormCustomDefault();
                             }
                         }
@@ -597,6 +675,23 @@ const onAttachmentB2BButton = () => {
     }
 }
 
+const resetInformation = () => {
+    removeCustomData("zipcode");
+    // removeCustomData("tax-regime");
+    removeCustomData("phone-new");
+    removeCustomData("payment-code");
+    removeCustomData("number-dep");
+    removeCustomData("number");
+    removeCustomData("neighborhood");
+    removeCustomData("isCorporateOms");
+    removeCustomData("city");
+    // removeCustomData("cfdi-code");
+    removeCustomData("business-name");
+    removeCustomData("business-line");
+    removeCustomData("address");
+    removeCustomData("RFC");
+}
+
 const setFormCustomDefault = () => {
     if (window.location.hash === '#/profile') {
         setTimeout(() => {
@@ -619,7 +714,7 @@ const setFormCustomDefault = () => {
 
                     return `<p class="${item.name} input text containerInputCustom">
               <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
-              <input type="${item.type}" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
+              <input type="${item.type}" autocomplete="off" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
               <span class="input-b2b-error"></span>
               ${item?.message ? `<span>${item?.message}</span>` : ""}
             </p>`
@@ -629,7 +724,7 @@ const setFormCustomDefault = () => {
                     $(".container-custom-data-form-element").html(fieldsToMap.toString().replace(/,/g, ''))
                 } else {
                     corporateInfoBox.append(
-                        `<div class="container-custom-data-form-element">${fieldsToMap.toString().replace(/,/g, '')}</div>`
+                        `<div class="container-custom-data-form-element FISICA">${fieldsToMap.toString().replace(/,/g, '')}</div>`
                     )
                 }
 
@@ -643,7 +738,7 @@ const setFormCustom = () => {
         setTimeout(() => {
             const corporateInfoBox = $('#button-b2b-form')
             const formCustom = $('.container-custom-data-form-element')
-            const buttonContinue = $('#go-to-shipping')
+            // const buttonContinue = $('#go-to-shipping')
 
             console.log("corporateInfoBox", corporateInfoBox.length ,formCustom.length)
           
@@ -671,7 +766,7 @@ const setFormCustom = () => {
 
                     return `<p class="${item.name} input text containerInputCustom">
               <label for="${item.name}"  class="labelInputCustom">${item.label}</label>
-              <input type="${item.type}" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
+              <input type="${item.type}" autocomplete="off" id="${item.name}" class="input-xlarge" name="${item.name}" onBlur="onBlurB2bForm('${item.name}')"/>
               <span class="input-b2b-error"></span>
               ${item?.message ? `<span>${item?.message}</span>` : ""}
             </p>`
@@ -681,7 +776,7 @@ const setFormCustom = () => {
                     $(".container-custom-data-form-element").html(fieldsToMap.toString().replace(/,/g, ''))
                 } else {
                     corporateInfoBox.append(
-                        `<div class="container-custom-data-form-element">${fieldsToMap.toString().replace(/,/g, '')}</div>`
+                        `<div class="container-custom-data-form-element MORAL">${fieldsToMap.toString().replace(/,/g, '')}</div>`
                     )
                 }
             }
@@ -695,16 +790,67 @@ const onChangeB2bRegimen = (id) => {
     if (opcionSeleccionada) {
         vtexjs.checkout.setCustomData({ field: id, app: appName, value: opcionSeleccionada.split('-')[0] })
     }
+    
+    if (typeInput === "Moral") {
+        const isGeneralError = fields.some(f => {
+            const regexTest = new RegExp(f.regex);
+            const cfdiValue = $("#cfdi-code").val();
+            const taxRegime = $("#tax-regime").val();
+            if (!cfdiValue) return true;
+            if (!taxRegime) return true;
+            if (!f.isRequired) return false;
+            if (!!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+            return !$(`#${f.name}`).val()
+        })
+
+        if (!isGeneralError) {
+            $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+            sessionStorage.setItem('b2b-form-complete', 'true');
+        } else {
+            $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+            sessionStorage.removeItem('b2b-form-complete');
+        }
+    } else {
+        const isGeneralError = fieldsNormal.some(f => {
+            const regexTest = new RegExp(f.regex);
+            const cfdiValue = $("#cfdi-code").val();
+            const taxRegime = $("#tax-regime").val();
+            if (!cfdiValue) return true;
+            if (!taxRegime) return true;
+            if (!f.isRequired) return false;
+            if (!!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+            return !$(`#${f.name}`).val()
+        })
+
+        if (!isGeneralError) {
+            $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+            sessionStorage.setItem('b2b-form-complete', 'true');
+        } else {
+            $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+            sessionStorage.removeItem('b2b-form-complete');
+        }
+    }
 }
 
 const onChangeB2bCFDI = (id) => {
     var selectElement = document.getElementById(id);
     var opcionSeleccionada = selectElement.options[selectElement.selectedIndex].value;
+    const checkedCorporative =  $("#corporative-si").is(":checked");
+    const checkedIsNotCorporative =  $("#corporative-no").is(":checked");
+
     if (opcionSeleccionada) {
 
-        const selectedElement = FIELD_CFDI[0].options.findIndex(o => o === opcionSeleccionada);
+        function eliminarDiacriticosEs(texto) {
+            return texto
+                    .trim()
+                   .normalize('NFD')
+                   .replace(/,/gi,"")
+                   .normalize()
+        }
+
+        const selectedElement = FIELD_CFDI[0].options.findIndex(o => eliminarDiacriticosEs(o) === eliminarDiacriticosEs(opcionSeleccionada));
         const selectedSub = FIELD_CFDI[0].suboptions[selectedElement];
-        console.log("selectedElement", selectedSub, opcionSeleccionada)
+        console.log("selectedElement", selectedElement, FIELD_CFDI[0], selectedSub, opcionSeleccionada, FIELD_CFDI[0].options)
 
         const selectedSubOptions = selectedSub.map(s => {
             return `<option value="${s}">${s}</option>`
@@ -715,6 +861,47 @@ const onChangeB2bCFDI = (id) => {
             ${selectedSubOptions.join('')}
         `)
         vtexjs.checkout.setCustomData({ field: id, app: appName, value: opcionSeleccionada.split('-')[0] })
+
+        if (typeInput === "Moral") {
+            const isGeneralError = fields.some(f => {
+                const regexTest = new RegExp(f.regex);
+                const cfdiValue = $("#cfdi-code").val();
+                const taxRegime = $("#tax-regime").val();
+                if (!cfdiValue) return true;
+                if (!taxRegime) return true;
+                if (!f.isRequired) return false;
+                if (!!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+                return !$(`#${f.name}`).val()
+            })
+
+            if (!isGeneralError) {
+                $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                sessionStorage.setItem('b2b-form-complete', 'true');
+            } else {
+                $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                sessionStorage.removeItem('b2b-form-complete');
+            }
+        } else {
+            const isGeneralError = fieldsNormal.some(f => {
+                const regexTest = new RegExp(f.regex);
+                const cfdiValue = $("#cfdi-code").val();
+                const taxRegime = $("#tax-regime").val();
+                if (!cfdiValue) return true;
+                if (!taxRegime) return true;
+                if (!f.isRequired) return false;
+                if (!!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+                return !$(`#${f.name}`).val()
+            })
+
+            if (!isGeneralError) {
+                $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                sessionStorage.setItem('b2b-form-complete', 'true');
+            } else {
+                $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                sessionStorage.removeItem('b2b-form-complete');
+            }
+        }
+
     }
 }
 
@@ -769,19 +956,36 @@ const onBlurB2bForm = (name) => {
             }
 
             if (typeInput === "Moral") {
-                const isError = fieldsNormal.some(f => {
+                const isError = fields.some(f => {
                     const regexTest = new RegExp(f.regex);
                     if (f.name === name && !!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
                     if (f.name === name && !f.isRequired) return false;
                     return f.name === name && !$(`#${f.name}`).val()
-                })      
+                })
+                
+                const isGeneralError = fields.some(f => {
+                    const regexTest = new RegExp(f.regex);
+                    const cfdiValue = $("#cfdi-code").val();
+                    const taxRegime = $("#tax-regime").val();
+                    if (!cfdiValue) return true;
+                    if (!taxRegime) return true;
+                    if (!f.isRequired) return false;
+                    if (!!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+                    return !$(`#${f.name}`).val()
+                })
 
-                if (!isError) {
+                if (!isGeneralError) {
                     $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                    sessionStorage.setItem('b2b-form-complete', 'true');
+                } else {
+                    $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                    sessionStorage.removeItem('b2b-form-complete');
+                }
+                
+                if (!isError) {
                     $(`#${name} + .input-b2b-error`).html('')
                 } else {
                     $(`#${name} + .input-b2b-error`).html('<span style="color: red">Campo incompleto</span><br/>')
-                    $('#go-to-shipping, #go-to-payment').prop('disabled', true)
                 }
             } else {
                 const isError = fieldsNormal.some(f => {
@@ -789,30 +993,66 @@ const onBlurB2bForm = (name) => {
                     if (f.name === name && !!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
                     if (f.name === name && !f.isRequired) return false;
                     return f.name === name && !$(`#${f.name}`).val()
-                })                
-
-                if (!isError) {
+                })         
+                
+                const isGeneralError = fieldsNormal.some(f => {
+                    const regexTest = new RegExp(f.regex);
+                    const cfdiValue = $("#cfdi-code").val();
+                    const taxRegime = $("#tax-regime").val();
+                    if (!cfdiValue) return true;
+                    if (!taxRegime) return true;
+                    if (!!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+                    if (!f.isRequired) return false;
+                    return !$(`#${f.name}`).val()
+                })
+console.log("isGeneralError ", isGeneralError )
+                if (!isGeneralError) {
                     $('#go-to-shipping, #go-to-payment').removeProp('disabled')
-                    $(`#${name} + .input-b2b-error`).html('')
+                    sessionStorage.setItem('b2b-form-complete', 'true');
                 } else {
                     $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                    sessionStorage.removeItem('b2b-form-complete');
+                }
+
+                if (!isError) {
+                    // $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                    $(`#${name} + .input-b2b-error`).html('')
+                } else {
+                    // $('#go-to-shipping, #go-to-payment').prop('disabled', true)
                     $(`#${name} + .input-b2b-error`).html('<span style="color: red">Campo incompleto</span><br/>')
                 }
             }
             vtexjs.checkout.setCustomData({ field: name, app: appName, value })
         } else {
+
+            const isGeneralError = fields.some(f => {
+                const regexTest = new RegExp(f.regex);
+                console.log("regexTest", f.regex)
+                if (!f.isRequired) return false;
+                if (!!(f.regex && !regexTest.test($(`#${f.name}`).val()))) return true;
+                return !$(`#${f.name}`).val()
+            })
+
             if (element.length && !$(`.${name} .errorCustom`).length && isRequired) {
                 $(`.${name}`).append(`<div class="help error errorCustom">Este campo es obligatorio</div>`)
+            }
+
+            if (!isGeneralError) {
+                $('#go-to-shipping, #go-to-payment').removeProp('disabled')
+                sessionStorage.setItem('b2b-form-complete', 'true');
+            } else {
+                $('#go-to-shipping, #go-to-payment').prop('disabled', true)
+                sessionStorage.removeItem('b2b-form-complete');
             }
 
             removeCustomData(name)
         }
     }
 
-    if (!validateErrors()) {
-        buttonContinue.css('pointer-events', 'all')
-        buttonContinue.css('opacity', 1)
-    }
+    // if (!validateErrors()) {
+    //     buttonContinue.css('pointer-events', 'all')
+    //     buttonContinue.css('opacity', 1)
+    // }
 }
 
 const validateErrors = () => {
